@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='http://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/highlight_default.css" media="all" />
+    <script src="javascripts/highlight.pack.js"></script>
+    <script src="javascripts/main.js"></script>
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>nickel.rs - web application framework for rust</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>nickel.rs</h1>
+        <h2>web application framework for rust</h2>
+        <div class="header-buttons">
+          <iframe src="http://ghbtns.com/github-btn.html?user=nickel-org&repo=nickel.rs&type=watch&count=true&size=large"
+  allowtransparency="true" frameborder="0" scrolling="0" width="130" height="30"></iframe>
+          <a href="http://nickel-org.github.io/nickel/" class="button">API docs</a>
+        </div>
+      </div>
+
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h3>
+<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Your first nickel app</h3>
+
+<!-- <p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p> -->
+
+<pre><code class="rust">extern crate http;
+extern crate nickel;
+
+use nickel::{ Nickel, Request, Response };
+
+fn main() {
+    let mut server = Nickel::new();
+    
+    fn a_handler (_request: &Request, response: &mut Response) { 
+        response.send("hello world"); 
+    }
+
+    server.get("/bar", a_handler);
+    server.listen(6767);
+}</code></pre>
+
+<h3>
+<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>Flexible routing</h3>
+
+<p>Routes can be as simple as <code>/foo</code>, use parameters, wildcards or even double wildcards.</p>
+
+<pre><code class="rust">extern crate http;
+extern crate nickel;
+
+use nickel::{ Nickel, Request, Response };
+
+fn main() {
+    let mut server = Nickel::new();
+
+    fn handler_with_param (request: &Request, response: &mut Response) {
+        let text = format!("This is user: {}", 
+                            request.params.get(&"userid".to_string()));
+        response.send(text.as_slice());
+    }
+
+    fn simple_handler (_request: &Request, response: &mut Response) { 
+        response.send("This is the /bar handler"); 
+    }
+
+    fn simple_wildcard (_request: &Request, response: &mut Response) { 
+        response.send("matches /a/b/d but not /a/b/c/d"); 
+    }
+
+    fn double_wildcard (_request: &Request, response: &mut Response) { 
+        response.send("This matches /a/b/d and also /a/b/c/d"); 
+    }
+
+    server.get("/bar", simple_handler);
+    server.get("/user/:userid", handler_with_param);
+    server.get("/a/*/d", simple_wildcard);
+    server.get("/a/**/d", double_wildcard);
+
+    server.listen(6767);
+}</code></pre>
+
+
+<h3>
+<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>Middleware</h3>
+
+<p>Middleware are the extensibility points of nickel. Batteries included! A bunch of existing Middleware comes right with nickel. Such as the <code>StaticFileHandler</code>, <code>Logger</code> or <code>JsonBodyParser</code> Middleware</p>
+
+<pre><code class="rust">extern crate http;
+extern crate nickel;
+
+use nickel::{ Nickel, Request, Response };
+
+fn main() {
+    let mut server = Nickel::new();
+    
+    server.utilize(Nickel::static_files("examples/assets/"));
+    server.utilize(Nickel::json_body_parser());
+
+    server.listen(6767);
+}</code></pre>
+
+<h3>
+<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>JSON handling</h3>
+
+<p>nickel makes it easy to map JSON data right onto you <code>struct</code>.</p>
+
+<pre><code class="rust">extern crate http;
+extern crate serialize;
+extern crate nickel;
+
+use nickel::{ Nickel, Request, Response, FromFn };
+
+#[deriving(Decodable, Encodable)]
+pub struct Person {
+    pub firstname: String,
+    pub lastname:  String,
+}
+
+fn main() {
+    let mut server = Nickel::new();
+    
+    server.utilize(Nickel::json_body_parser());
+
+    fn post_handler (request: &Request, response: &mut Response) { 
+        let person = request.json_as::<&zwnj;Person>().unwrap();
+        let text = format!("Hello {} {}", person.firstname, person.lastname);
+        response.send(text.as_slice()); 
+    }
+    
+    server.post("/a/post/request", post_handler);
+    server.listen(6767);
+}</code></pre>
+
+<h3>
+<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>About</h3>
+
+          <p>nickel is brought to you by the people of <a href="https://twitter.com/thoughtram">@thoughtram</a> and friends. It's MIT licensed. We welcome your contribution.</p>
+
+        </section>
+
+<!--         <aside id="sidebar">
+
+          <a href="http://nickel-org.github.io/nickel/" class="button">
+            API docs
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/nickel-org/site"></a> is maintained by <a href="https://github.com/nickel-org">nickel-org</a>.</p>
+
+          <p>nickel is brought to you by the people of <a href="https://twitter.com/thoughtram">@thoughtram</a> and friends. It's MIT licensed. We welcome your contribution.</p>
+        </aside> -->
+      </div>
+    </div>
+
+  
+  </body>
+</html>
