@@ -38,6 +38,7 @@
         <div class="header-buttons">
           <iframe src="http://ghbtns.com/github-btn.html?user=nickel-org&repo=nickel.rs&type=watch&count=true&size=large"
   allowtransparency="true" frameborder="0" scrolling="0" width="130" height="30"></iframe>
+          <a href="/" class="button">Home</a>
           <a href="http://docs.nickel.rs/nickel/" class="button">API docs</a>
         </div>
       </div>
@@ -55,14 +56,14 @@
 <h3>
 <a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>1. Get a recent version of Rust and Cargo</h3>
 
-<p>In order to write a nickel app you first need to make sure to have a recent version of Rust and Cargo. In case you are wondering Cargo is the package manager for Rust. It makes dependency and build management a breeze.</p>
+<p>In order to write a nickel app you first need to make sure to have a recent version of Rust and <a href="http://crates.io/">Cargo</a>. In case you are wondering Cargo is the package manager for Rust. It makes dependency and build management a breeze. The easiest way to install both is just a simple one liner on your shell.</p>
 
 
 <pre><code>$ curl -s http://www.rust-lang.org/rustup.sh | sudo sh
 </code></pre>
 
 <h3>
-<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>2. Create a working directory and <code>cd</code> into it</h3>
+<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>2. Create a new working directory and <code>cd</code> into it</h3>
 
 <pre><code>$ mkdir nickel-demo
 $ cd nickel-demo
@@ -71,7 +72,7 @@ $ cd nickel-demo
 <h3>
 <a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>3. Create a <code>Cargo.toml</code> file</h3>
 
-<p>The <code>Cargo.toml</code> file is the manifest that describes all dependencies of your app and also tells Cargo which file is the entry point of your app. Just place it directly in the <code>nickel-demo</code> directory.</p>
+<p>The <code>Cargo.toml</code> file is the manifest that describes all dependencies of your app and also tells Cargo which file is the entry point of your app. Just place it directly into the <code>nickel-demo</code> directory.</p>
 
 <pre><code>[package]
 
@@ -92,7 +93,7 @@ git = "https://github.com/nickel-org/nickel.rs.git"
 <h3>
 <a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>4. Create a <code>main.rs</code> file</h3>
 
-<p>You may have spotted the <code>path = "src/main.rs"</code> in your <code>Cargo.toml</code>file. This is where we will put the code for your first nickel app. You may choose a different file name but at the time of writing Cargo assumes your file to be in <code>src/main.rs</code> for the <code>cargo run</code> command to work which we will use in a moment.
+<p>You may have spotted the <code>path = "src/main.rs"</code> in your <code>Cargo.toml</code>file. This is where we will put the code for your first nickel app. You may want to choose a different file name but at the time of writing Cargo assumes your file to be in <code>src/main.rs</code> for the <code>cargo run</code> command to work which we will use in a moment.
 </p>
 
 <p>Paste this into your <code>main.rs</code> file in the <code>src</code> directory.
