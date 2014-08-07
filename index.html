@@ -180,7 +180,7 @@ use std::io::net::ip::Ipv4Addr;
 use nickel::{
     Nickel, NickelError, ErrorWithStatusCode,
     Action, Continue, Halt, Request,
-    Response, IntoErrorHandler, get_media_type,
+    Response, IntoErrorHandler,
 };
 
 fn main() {
@@ -189,7 +189,7 @@ fn main() {
     fn custom_404 (err: &NickelError, _req: &Request, response: &mut Response) -> Result&lt;Action, NickelError&gt; {
         match err.kind {
             ErrorWithStatusCode(NotFound) => {
-                response.origin.headers.content_type = get_media_type("html");
+                response.set_content_type("html");
                 response.origin.status = NotFound;
                 response.send("&lt;h1&gt;Call the police!&lt;h1&gt;");
                 Ok(Halt)
