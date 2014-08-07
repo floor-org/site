@@ -49,7 +49,7 @@
       <div class="inner clearfix">
         <section id="main-content">
           <h3>
-<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Your first nickel app</h3>
+<a name="hello-world" class="anchor" href="#hello-world"><span class="octicon octicon-link"></span>Your first nickel app</a></h3>
 
 <!-- <p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p> -->
 
@@ -71,7 +71,7 @@ fn main() {
 }</code></pre>
 
 <h3>
-<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>Flexible routing</h3>
+<a name="routing" class="anchor" href="#routing"><span class="octicon octicon-link"></span>Flexible routing</a></h3>
 
 <p>Routes can be as simple as <code>/foo</code>, use parameters, wildcards or even double wildcards.</p>
 
@@ -112,7 +112,7 @@ fn main() {
 
 
 <h3>
-<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>Middleware</h3>
+<a name="middleware" class="anchor" href="#middleware"><span class="octicon octicon-link"></span>Middleware</a></h3>
 
 <p>Middleware are the extensibility points of nickel. Batteries included! A bunch of existing Middleware comes right with nickel. Such as the <code>StaticFileHandler</code>, <code>Logger</code> or <code>JsonBodyParser</code> Middleware</p>
 
@@ -132,7 +132,7 @@ fn main() {
 }</code></pre>
 
 <h3>
-<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>JSON handling</h3>
+<a name="json-handling" class="anchor" href="#json-handling"><span class="octicon octicon-link"></span>JSON handling</a></h3>
 
 <p>nickel makes it easy to map JSON data right onto you <code>struct</code>.</p>
 
@@ -141,7 +141,7 @@ extern crate serialize;
 extern crate nickel;
 
 use std::io::net::ip::Ipv4Addr;
-use nickel::{ Nickel, Request, Response, FromFn };
+use nickel::{ Nickel, Request, Response };
 
 #[deriving(Decodable, Encodable)]
 struct Person {
@@ -165,7 +165,45 @@ fn main() {
 }</code></pre>
 
 <h3>
-<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>About</h3>
+<a name="error-handling" class="anchor" href="#error-handling"><span class="octicon octicon-link"></span>Custom error handler</a></h3>
+
+<p>
+  By default nickel catches all errors with it's default <code>ErrorHandler</code> and tries to take reasonable actions. In cases where one wants to provide an own <code>ErrorHandler</code> (e.g. for custom 404 pages), it's trivial to write one.
+</p>
+
+<pre><code class="rust">extern crate http;
+extern crate serialize;
+extern crate nickel;
+
+use http::status::NotFound;
+use std::io::net::ip::Ipv4Addr;
+use nickel::{
+    Nickel, NickelError, ErrorWithStatusCode,
+    Action, Continue, Halt, Request,
+    Response, IntoErrorHandler, get_media_type,
+};
+
+fn main() {
+    let mut server = Nickel::new();
+    
+    fn custom_404 (err: &NickelError, _req: &Request, response: &mut Response) -> Result&lt;Action, NickelError&gt; {
+        match err.kind {
+            ErrorWithStatusCode(NotFound) => {
+                response.origin.headers.content_type = get_media_type("html");
+                response.origin.status = NotFound;
+                response.send("&lt;h1&gt;Call the police!&lt;h1&gt;");
+                Ok(Halt)
+            },
+            _ => Ok(Continue)
+        }
+    }
+
+    server.handle_error(IntoErrorHandler::from_fn(custom_404));
+    server.listen(Ipv4Addr(127, 0, 0, 1), 6767);
+}</code></pre>
+
+<h3>
+<a name="about" class="anchor" href="#about"><span class="octicon octicon-link"></span>About</a></h3>
 
           <p>nickel is brought to you by the people of <a href="http://thoughtram.io/">thoughtram</a> and friends. It's MIT licensed. We welcome your contribution.</p>
 
