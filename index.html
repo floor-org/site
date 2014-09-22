@@ -203,6 +203,50 @@ fn main() {
 }</code></pre>
 
 <h3>
+<a name="error-handling" class="anchor" href="#error-handling"><span class="octicon octicon-link"></span>Easy Templating</a></h3>
+
+<p>
+  Nickel supports defining templates with mustache.rs. All you need is to create the template...
+</p>
+
+<pre><code class="html">&lt;html&gt;
+    &lt;body&gt;
+        &lt;h1&gt;
+            Hello {{ name }}!
+        &lt;/h1&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p>
+  ...and pass it to <code>responser.render(template, data)</code>.
+</p>
+
+<pre><code class="rust">extern crate nickel;
+extern crate http;
+
+use nickel::{ Nickel, Request, Response }; 
+use std::io::net::ip::Ipv4Addr;
+use std::collections::HashMap;
+
+fn main() {
+
+    let mut server = Nickel::new();
+
+    fn handler (_request: &Request, response: &mut Response) {
+        let mut data = HashMap::&lt;&str, &str&gt;::new();
+        data.insert("name", "user");
+        response.render("examples/assets/template.tpl", &data);
+    }
+
+    server.get("/", handler);
+
+    server.listen(Ipv4Addr(127, 0, 0, 1), 6767);
+}
+</code></pre>
+
+
+<h3>
 <a name="about" class="anchor" href="#about"><span class="octicon octicon-link"></span>About</a></h3>
 
           <p>nickel is brought to you by the people of <a href="http://thoughtram.io/">thoughtram</a> and friends. It's MIT licensed. We welcome your contribution.</p>
