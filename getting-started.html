@@ -63,27 +63,33 @@
 </code></pre>
 
 <h3>
-<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>2. Create a new working directory and <code>cd</code> into it</h3>
+<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>2. Let Cargo generate a new project directory and <code>cd</code> into it</h3>
 
-<pre><code>$ mkdir nickel-demo
-$ cd nickel-demo
-</code></pre>
+<pre><code>$ cargo new nickel-demo --bin && cd nickel-demo</code></pre>
+
+By feeding <code>--bin</code> to the <code>cargo new</code> we command cargo to choose the project folder layout for programs instead of libraries. This will also make sure that we can later just use <code>cargo run</code> to start the program.
 
 <h3>
-<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>3. Create a <code>Cargo.toml</code> file</h3>
+<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>3. Edit the generated <code>Cargo.toml</code> file</h3>
 
-<p>The <code>Cargo.toml</code> file is the manifest that describes all dependencies of your app and also tells Cargo which file is the entry point of your app. Just place it directly into the <code>nickel-demo</code> directory.</p>
+<p>The <code>Cargo.toml</code> file is the manifest that describes all dependencies of your app and also tells Cargo how to build the project. Just append the following to the file to make Cargo aware of the nickel.rs dependency.</p>
 
-<pre><code>[package]
+<pre><code>
 
-name = "nickel-demo"
-version = "0.1.0"
-authors = [ "your-name@gmail.com" ]
+[dependencies.nickel]
 
-[[bin]]
+git = "https://github.com/nickel-org/nickel.rs.git"
+</code></pre>
 
-name = "nickel-demo"
-path = "src/main.rs"
+By now your <code>Cargo.toml</code> file should look like this:
+
+<pre><code>
+[package]
+
+name = "my-demo"
+version = "0.0.1"
+authors = ["Your Name &lt;your.name@somewhere.com&gt;"]
+
 
 [dependencies.nickel]
 
@@ -91,12 +97,9 @@ git = "https://github.com/nickel-org/nickel.rs.git"
 </code></pre>
 
 <h3>
-<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>4. Create a <code>main.rs</code> file</h3>
+<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>4. Edit the generated <code>main.rs</code> file</h3>
 
-<p>You may have spotted the <code>path = "src/main.rs"</code> in your <code>Cargo.toml</code>file. This is where we will put the code for your first nickel app. You may want to choose a different file name but at the time of writing Cargo assumes your file to be in <code>src/main.rs</code> for the <code>cargo run</code> command to work which we will use in a moment.
-</p>
-
-<p>Paste this into your <code>main.rs</code> file in the <code>src</code> directory.
+<p>Cargo generated a <code>main.rs</code> in the <code>src</code> directory of your project. It comes predefined with a hello world implementation. This is where we will put the code for your first nickel app. Delete the content and overwrite it with this:
 </p>
 
 <pre><code>extern crate nickel;
