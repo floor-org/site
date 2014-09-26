@@ -85,8 +85,7 @@ fn main() {
     let mut server = Nickel::new();
 
     fn handler_with_param (request: &Request, response: &mut Response) {
-        let text = format!("This is user: {}", 
-                            request.params.get(&"userid".to_string()));
+        let text = format!("This is user: {}", request.param("userid"));
         response.send(text.as_slice());
     }
 
