@@ -105,7 +105,7 @@ git = "https://github.com/nickel-org/nickel.rs.git"
 <pre><code>extern crate nickel;
 
 use std::io::net::ip::Ipv4Addr;
-use nickel::{ Nickel, Request, Response };
+use nickel::{ Nickel, Request, Response, HttpRouter };
 
 fn main() {
     let mut server = Nickel::new();
