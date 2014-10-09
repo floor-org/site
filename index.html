@@ -119,12 +119,12 @@ fn main() {
 extern crate nickel;
 
 use std::io::net::ip::Ipv4Addr;
-use nickel::{ Nickel, Request, Response };
+use nickel::{ Nickel, Request, Response, StaticFilesHandler };
 
 fn main() {
     let mut server = Nickel::new();
     
-    server.utilize(Nickel::static_files("examples/assets/"));
+    server.utilize(StaticFilesHandler::new("examples/assets/"));
     server.utilize(Nickel::json_body_parser());
 
     server.listen(Ipv4Addr(127, 0, 0, 1), 6767);
