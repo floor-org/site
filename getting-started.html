@@ -79,6 +79,11 @@ By feeding <code>--bin</code> to the <code>cargo new</code> we command cargo to 
 [dependencies.nickel]
 
 git = "https://github.com/nickel-org/nickel.rs.git"
+
+[dependencies.nickel_macros]
+
+git = "https://github.com/nickel-org/nickel.rs.git"
+
 </code></pre>
 
 By now your <code>Cargo.toml</code> file should look like this:
@@ -94,6 +99,11 @@ authors = ["Your Name &lt;your.name@somewhere.com&gt;"]
 [dependencies.nickel]
 
 git = "https://github.com/nickel-org/nickel.rs.git"
+
+[dependencies.nickel_macros]
+
+git = "https://github.com/nickel-org/nickel.rs.git"
+
 </code></pre>
 
 <h3>
@@ -104,29 +114,33 @@ git = "https://github.com/nickel-org/nickel.rs.git"
 
 <pre><code>extern crate nickel;
 
-use std::io::net::ip::Ipv4Addr;
-use nickel::{ Nickel, Request, Response, HttpRouter };
+#[macro_use] extern crate nickel_macros;
+extern crate nickel;
+
+use nickel::Nickel;
 
 fn main() {
     let mut server = Nickel::new();
-    
-    fn a_handler (_request: &Request, response: &mut Response) { 
-        response.send("hello world"); 
-    }
 
-    server.get("/hello", a_handler);
-    server.listen(Ipv4Addr(127, 0, 0, 1), 6767);
-}</code></pre>
+    server.utilize(router! {
+        get "**" => |_req, _res| {
+            "Hello world!"
+        }
+    });
+
+    server.listen("127.0.0.1:6767");
+}
+</code></pre>
 
 <h3>
 <a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>5. Run your app</h3>
 
-<p>Congrats! You created your first nickel app. Just type <code>cargo run</code> on your console and visit <code>http://localhost:6767/hello</code> in your browser. It should print out <code>hello world</code>.
+<p>Congrats! You created your first nickel app. Just type <code>cargo run</code> on your console and visit <code>http://localhost:6767</code> in your browser. It should print out <code>hello world</code>.
 
         </section>
       </div>
     </div>
 
-  
+
   </body>
 </html>
