@@ -53,30 +53,30 @@
 
 <!-- <p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p> -->
 
-<pre><code class="rust">extern crate http;
+<pre><code class="rust">#[macro_use]
 extern crate nickel;
 
-use std::io::net::ip::Ipv4Addr;
-use nickel::{ Nickel, Request, Response };
+use nickel::Nickel;
 
 fn main() {
     let mut server = Nickel::new();
-    
-    fn a_handler (_request: &Request, response: &mut Response) { 
-        response.send("hello world"); 
-    }
 
-    server.get("/bar", a_handler);
-    server.listen(Ipv4Addr(127, 0, 0, 1), 6767);
-}</code></pre>
+    server.utilize(router! {
+        get "**" => |_req, _res| {
+            "Hello world!"
+        }
+    });
+
+    server.listen("127.0.0.1:6767");
+}
+</code></pre>
 
 <h3>
 <a name="routing" class="anchor" href="#routing"><span class="octicon octicon-link"></span>Flexible routing</a></h3>
 
 <p>Routes can be as simple as <code>/foo</code>, use parameters, wildcards or even double wildcards.</p>
 
-<pre><code class="rust">extern crate http;
-extern crate nickel;
+<pre><code class="rust">extern crate nickel;
 
 use std::io::net::ip::Ipv4Addr;
 use nickel::{ Nickel, Request, Response };
@@ -84,50 +84,32 @@ use nickel::{ Nickel, Request, Response };
 fn main() {
     let mut server = Nickel::new();
 
-    fn handler_with_param (request: &Request, response: &mut Response) {
-        let text = format!("This is user: {}", request.param("userid"));
-        response.send(text.as_slice());
-    }
+    server.get("/bar", middleware!("This is the /bar handler"));
+    server.get("/user/:userid", middleware! { |request|
+        format!("This is user: {}", request.param("userid"))
+    });
+    server.get("/a/*/d", middleware!("matches /a/b/d but not /a/b/c/d""));
+    server.get("/a/**/d", middleware!("This matches /a/b/d and also /a/b/c/d"));
 
-    fn simple_handler (_request: &Request, response: &mut Response) { 
-        response.send("This is the /bar handler"); 
-    }
-
-    fn simple_wildcard (_request: &Request, response: &mut Response) { 
-        response.send("matches /a/b/d but not /a/b/c/d"); 
-    }
-
-    fn double_wildcard (_request: &Request, response: &mut Response) { 
-        response.send("This matches /a/b/d and also /a/b/c/d"); 
-    }
-
-    server.get("/bar", simple_handler);
-    server.get("/user/:userid", handler_with_param);
-    server.get("/a/*/d", simple_wildcard);
-    server.get("/a/**/d", double_wildcard);
-
-    server.listen(Ipv4Addr(127, 0, 0, 1), 6767);
+    server.listen("127.0.0.1:6767");
 }</code></pre>
 
 
 <h3>
 <a name="middleware" class="anchor" href="#middleware"><span class="octicon octicon-link"></span>Middleware</a></h3>
 
-<p>Middleware are the extensibility points of nickel. Batteries included! A bunch of existing Middleware comes right with nickel. Such as the <code>StaticFileHandler</code>, <code>Logger</code> or <code>JsonBodyParser</code> Middleware</p>
+<p>Middleware are the extensibility points of nickel. Batteries included! A bunch of existing Middleware comes right with nickel.</p>
 
-<pre><code class="rust">extern crate http;
-extern crate nickel;
+<pre><code class="rust">extern crate nickel;
 
-use std::io::net::ip::Ipv4Addr;
 use nickel::{ Nickel, Request, Response, StaticFilesHandler };
 
 fn main() {
     let mut server = Nickel::new();
-    
-    server.utilize(StaticFilesHandler::new("examples/assets/"));
-    server.utilize(Nickel::json_body_parser());
 
-    server.listen(Ipv4Addr(127, 0, 0, 1), 6767);
+    server.utilize(StaticFilesHandler::new("examples/assets/"));
+
+    server.listen("127.0.0.1:6767");
 }</code></pre>
 
 <h3>
@@ -135,14 +117,12 @@ fn main() {
 
 <p>nickel makes it easy to map JSON data right onto your <code>struct</code>.</p>
 
-<pre><code class="rust">extern crate http;
-extern crate serialize;
+<pre><code class="rust">extern crate rustc_serialize;
 extern crate nickel;
 
-use std::io::net::ip::Ipv4Addr;
 use nickel::{ Nickel, Request, Response };
 
-#[deriving(Decodable, Encodable)]
+#[derive(RustcDecodable, RustcEncodable)]
 struct Person {
     firstname: String,
     lastname:  String,
@@ -150,16 +130,12 @@ struct Person {
 
 fn main() {
     let mut server = Nickel::new();
-    
-    server.utilize(Nickel::json_body_parser());
 
-    fn post_handler (request: &Request, response: &mut Response) { 
-        let person = request.json_as::<&zwnj;Person>().unwrap();
-        let text = format!("Hello {} {}", person.firstname, person.lastname);
-        response.send(text.as_slice()); 
-    }
-    
-    server.post("/a/post/request", post_handler);
+    server.post("/a/post/request", middleware! { |request, response|
+        let person = request.json_as::&zwnj;Person>().unwrap();
+        format!("Hello {} {}", person.firstname, person.lastname)
+    });
+
     server.listen(Ipv4Addr(127, 0, 0, 1), 6767);
 }</code></pre>
 
@@ -170,35 +146,38 @@ fn main() {
   By default nickel catches all errors with its default <code>ErrorHandler</code> and tries to take reasonable actions. In cases where one wants to provide an own <code>ErrorHandler</code> (e.g. for custom 404 pages), it's trivial to write one.
 </p>
 
-<pre><code class="rust">extern crate http;
-extern crate serialize;
+<pre><code class="rust">
 extern crate nickel;
 
-use http::status::NotFound;
-use std::io::net::ip::Ipv4Addr;
+use nickel::status::StatusCode::{self, NotFound, BadRequest};
 use nickel::{
-    Nickel, NickelError, ErrorWithStatusCode,
-    Action, Continue, Halt, Request,
-    Response, IntoErrorHandler,
+    Nickel, NickelError, Action, Continue, Halt,
+    Request, Response, IntoErrorHandler,
 };
 
 fn main() {
     let mut server = Nickel::new();
-    
-    fn custom_404 (err: &NickelError, _req: &Request, response: &mut Response) -> Result&lt;Action, NickelError&gt; {
-        match err.kind {
-            ErrorWithStatusCode(NotFound) => {
-                response.content_type("html")
-                        .status_code(NotFound)
-                        .send("&lt;h1&gt;Call the police!&lt;h1&gt;");
-                Ok(Halt)
-            },
-            _ => Ok(Continue)
+
+    //this is how to overwrite the default error handler to handle 404 cases with a custom view
+    fn custom_404<'a>(err: &mut NickelError, _req: &mut Request) -> Action {
+        if let Some(ref mut res) = err.stream {
+            if res.status() == NotFound {
+                let _ = res.write_all(b"<h1>Call the police!</h1>");
+                return Halt(())
+            }
         }
+
+        Continue(())
     }
 
-    server.handle_error(IntoErrorHandler::from_fn(custom_404));
-    server.listen(Ipv4Addr(127, 0, 0, 1), 6767);
+
+    // issue #20178
+    let custom_handler: fn(&mut NickelError, &mut Request) -> Action = custom_404;
+
+    server.handle_error(custom_handler);
+
+    server.listen("127.0.0.1:6767");
+
 }</code></pre>
 
 <h3>
@@ -221,11 +200,10 @@ fn main() {
   ...and pass it to <code>response.render(template, data)</code>.
 </p>
 
-<pre><code class="rust">extern crate nickel;
-extern crate http;
+<pre><code class="rust">#[macro_use]
+extern crate nickel;
 
-use nickel::{ Nickel, Request, Response }; 
-use std::io::net::ip::Ipv4Addr;
+use nickel::{Nickel, Request, Response, HttpRouter, MiddlewareResult};
 use std::collections::HashMap;
 
 fn main() {
@@ -238,10 +216,11 @@ fn main() {
         response.render("examples/assets/template.tpl", &data);
     }
 
-    server.get("/", handler);
+    server.get("/", middleware!(@handler));
 
-    server.listen(Ipv4Addr(127, 0, 0, 1), 6767);
+    server.listen("127.0.0.1:6767");
 }
+
 </code></pre>
 
 
@@ -254,6 +233,6 @@ fn main() {
       </div>
     </div>
 
-  
+
   </body>
 </html>
