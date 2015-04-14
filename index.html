@@ -78,7 +78,6 @@ fn main() {
 
 <pre><code class="rust">extern crate nickel;
 
-use std::io::net::ip::Ipv4Addr;
 use nickel::{ Nickel, Request, Response };
 
 fn main() {
@@ -88,7 +87,7 @@ fn main() {
     server.get("/user/:userid", middleware! { |request|
         format!("This is user: {}", request.param("userid"))
     });
-    server.get("/a/*/d", middleware!("matches /a/b/d but not /a/b/c/d""));
+    server.get("/a/*/d", middleware!("matches /a/b/d but not /a/b/c/d"));
     server.get("/a/**/d", middleware!("This matches /a/b/d and also /a/b/c/d"));
 
     server.listen("127.0.0.1:6767");
@@ -146,8 +145,7 @@ fn main() {
   By default nickel catches all errors with its default <code>ErrorHandler</code> and tries to take reasonable actions. In cases where one wants to provide an own <code>ErrorHandler</code> (e.g. for custom 404 pages), it's trivial to write one.
 </p>
 
-<pre><code class="rust">
-extern crate nickel;
+<pre><code class="rust">extern crate nickel;
 
 use nickel::status::StatusCode::{self, NotFound, BadRequest};
 use nickel::{
