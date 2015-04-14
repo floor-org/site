@@ -53,8 +53,7 @@
 
 <!-- <p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p> -->
 
-<pre><code class="rust">#[macro_use]
-extern crate nickel;
+<pre><code class="rust">#[macro_use] extern crate nickel;
 
 use nickel::Nickel;
 
@@ -76,7 +75,7 @@ fn main() {
 
 <p>Routes can be as simple as <code>/foo</code>, use parameters, wildcards or even double wildcards.</p>
 
-<pre><code class="rust">extern crate nickel;
+<pre><code class="rust">#[macro_use] extern crate nickel;
 
 use nickel::{ Nickel, Request, Response };
 
@@ -99,7 +98,7 @@ fn main() {
 
 <p>Middleware are the extensibility points of nickel. Batteries included! A bunch of existing Middleware comes right with nickel.</p>
 
-<pre><code class="rust">extern crate nickel;
+<pre><code class="rust">#[macro_use] extern crate nickel;
 
 use nickel::{ Nickel, Request, Response, StaticFilesHandler };
 
@@ -117,7 +116,7 @@ fn main() {
 <p>nickel makes it easy to map JSON data right onto your <code>struct</code>.</p>
 
 <pre><code class="rust">extern crate rustc_serialize;
-extern crate nickel;
+#[macro_use] extern crate nickel;
 
 use nickel::{ Nickel, Request, Response };
 
@@ -145,7 +144,7 @@ fn main() {
   By default nickel catches all errors with its default <code>ErrorHandler</code> and tries to take reasonable actions. In cases where one wants to provide an own <code>ErrorHandler</code> (e.g. for custom 404 pages), it's trivial to write one.
 </p>
 
-<pre><code class="rust">extern crate nickel;
+<pre><code class="rust">#[macro_use] extern crate nickel;
 
 use nickel::status::StatusCode::{self, NotFound, BadRequest};
 use nickel::{
@@ -198,8 +197,7 @@ fn main() {
   ...and pass it to <code>response.render(template, data)</code>.
 </p>
 
-<pre><code class="rust">#[macro_use]
-extern crate nickel;
+<pre><code class="rust">#[macro_use] extern crate nickel;
 
 use nickel::{Nickel, Request, Response, HttpRouter, MiddlewareResult};
 use std::collections::HashMap;
