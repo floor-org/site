@@ -160,7 +160,7 @@ fn main() {
     fn custom_404<'a>(err: &mut NickelError, _req: &mut Request) -> Action {
         if let Some(ref mut res) = err.stream {
             if res.status() == NotFound {
-                let _ = res.write_all(b"<h1>Call the police!</h1>");
+                let _ = res.write_all(b"&lt;h1>Call the police!&lt;/h1>");
                 return Halt(())
             }
         }
