@@ -75,11 +75,8 @@ By feeding <code>--bin</code> to the <code>cargo new</code> we command cargo to 
 <p>The <code>Cargo.toml</code> file is the manifest that describes all dependencies of your app and also tells Cargo how to build the project. Just append the following to the file to make Cargo aware of the nickel.rs dependency.</p>
 
 <pre><code>
-
-[dependencies.nickel]
-
-git = "https://github.com/nickel-org/nickel.rs.git"
-
+[dependencies]
+nickel = "*"
 </code></pre>
 
 By now your <code>Cargo.toml</code> file should look like this:
@@ -92,10 +89,8 @@ version = "0.0.1"
 authors = ["Your Name &lt;your.name@somewhere.com&gt;"]
 
 
-[dependencies.nickel]
-
-git = "https://github.com/nickel-org/nickel.rs.git"
-
+[dependencies]
+nickel = "*"
 </code></pre>
 
 <h3>

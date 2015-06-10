@@ -77,14 +77,14 @@ fn main() {
 
 <pre><code class="rust">#[macro_use] extern crate nickel;
 
-use nickel::{ Nickel, Request, Response };
+use nickel::{Nickel, HttpRouter};
 
 fn main() {
     let mut server = Nickel::new();
 
     server.get("/bar", middleware!("This is the /bar handler"));
     server.get("/user/:userid", middleware! { |request|
-        format!("This is user: {}", request.param("userid"))
+        format!("This is user: {:?}", request.param("userid"))
     });
     server.get("/a/*/d", middleware!("matches /a/b/d but not /a/b/c/d"));
     server.get("/a/**/d", middleware!("This matches /a/b/d and also /a/b/c/d"));
@@ -100,7 +100,7 @@ fn main() {
 
 <pre><code class="rust">#[macro_use] extern crate nickel;
 
-use nickel::{ Nickel, Request, Response, StaticFilesHandler };
+use nickel::{Nickel, StaticFilesHandler};
 
 fn main() {
     let mut server = Nickel::new();
@@ -115,10 +115,12 @@ fn main() {
 
 <p>nickel makes it easy to map JSON data right onto your <code>struct</code>.</p>
 
+<p>This example requires adding the <code>rustc-serialize</code> dependancy to your Cargo.toml</p>
+
 <pre><code class="rust">extern crate rustc_serialize;
 #[macro_use] extern crate nickel;
 
-use nickel::{ Nickel, Request, Response };
+use nickel::{Nickel, HttpRouter, JsonBody};
 
 #[derive(RustcDecodable, RustcEncodable)]
 struct Person {
@@ -134,7 +136,7 @@ fn main() {
         format!("Hello {} {}", person.firstname, person.lastname)
     });
 
-    server.listen(Ipv4Addr(127, 0, 0, 1), 6767);
+    server.listen("127.0.0.1:6767");
 }</code></pre>
 
 <h3>
@@ -146,11 +148,9 @@ fn main() {
 
 <pre><code class="rust">#[macro_use] extern crate nickel;
 
-use nickel::status::StatusCode::{self, NotFound, BadRequest};
-use nickel::{
-    Nickel, NickelError, Action, Continue, Halt,
-    Request, Response, IntoErrorHandler,
-};
+use std::io::Write;
+use nickel::status::StatusCode::NotFound;
+use nickel::{Nickel, NickelError, Action, Continue, Halt, Request};
 
 fn main() {
     let mut server = Nickel::new();
@@ -199,25 +199,20 @@ fn main() {
 
 <pre><code class="rust">#[macro_use] extern crate nickel;
 
-use nickel::{Nickel, Request, Response, HttpRouter, MiddlewareResult};
 use std::collections::HashMap;
+use nickel::{Nickel, HttpRouter};
 
 fn main() {
-
     let mut server = Nickel::new();
 
-    fn handler (_request: &Request, response: &mut Response) {
-        let mut data = HashMap::&lt;&str, &str&gt;::new();
+    server.get("/", middleware! { |_, response|
+        let mut data = HashMap::new();
         data.insert("name", "user");
-        response.render("examples/assets/template.tpl", &data);
-    }
-
-    server.get("/", middleware!(@handler));
+        return response.render("examples/assets/template.tpl", &data);
+    });
 
     server.listen("127.0.0.1:6767");
-}
-
-</code></pre>
+}</code></pre>
 
 
 <h3>
