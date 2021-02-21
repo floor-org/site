@@ -66,7 +66,7 @@ fn main() {
         }
     });
 
-    server.listen("127.0.0.1:6767");
+    server.listen("127.0.0.1:6767").unwrap();
 }
 </code></pre>
 
@@ -89,7 +89,7 @@ fn main() {
     server.get("/a/*/d", middleware!("matches /a/b/d but not /a/b/c/d"));
     server.get("/a/**/d", middleware!("This matches /a/b/d and also /a/b/c/d"));
 
-    server.listen("127.0.0.1:6767");
+    server.listen("127.0.0.1:6767").unwrap();
 }</code></pre>
 
 
@@ -107,7 +107,7 @@ fn main() {
 
     server.utilize(StaticFilesHandler::new("examples/assets/"));
 
-    server.listen("127.0.0.1:6767");
+    server.listen("127.0.0.1:6767").unwrap();
 }</code></pre>
 
 <h3>
@@ -136,7 +136,7 @@ fn main() {
         format!("Hello {} {}", person.firstname, person.lastname)
     });
 
-    server.listen("127.0.0.1:6767");
+    server.listen("127.0.0.1:6767").unwrap();
 }</code></pre>
 
 <h3>
@@ -173,7 +173,7 @@ fn main() {
 
     server.handle_error(custom_handler);
 
-    server.listen("127.0.0.1:6767");
+    server.listen("127.0.0.1:6767").unwrap();
 
 }</code></pre>
 
@@ -211,7 +211,7 @@ fn main() {
         return response.render("examples/assets/template.tpl", &data);
     });
 
-    server.listen("127.0.0.1:6767");
+    server.listen("127.0.0.1:6767").unwrap();
 }</code></pre>
 
 
